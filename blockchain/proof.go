@@ -9,9 +9,11 @@ import (
 	"math"
 	"math/big"
 )
+
 const Difficulty = 12
+
 type ProofOfWork struct {
-	Block *Block
+	Block  *Block
 	Target *big.Int
 }
 
@@ -24,6 +26,7 @@ func NewProofOfWork(b *Block) *ProofOfWork {
 	return pow
 }
 
+// turning data to hex
 func ToHex(num int64) []byte {
 	buff := new(bytes.Buffer)
 	err := binary.Write(buff, binary.BigEndian, num)
@@ -33,6 +36,7 @@ func ToHex(num int64) []byte {
 	return buff.Bytes()
 }
 
+// create the nonce
 func (pow *ProofOfWork) InitNonce(nonce int) []byte {
 	data := bytes.Join(
 		[][]byte{
@@ -40,13 +44,13 @@ func (pow *ProofOfWork) InitNonce(nonce int) []byte {
 			pow.Block.Data,
 			ToHex(int64(nonce)),
 			ToHex(int64(Difficulty)),
-		
 		},
 		[]byte{},
 	)
 	return data
 }
 
+// run the pow algo
 func (pow *ProofOfWork) Run() (int, []byte) {
 	var intHash big.Int
 	var hash [32]byte
@@ -71,6 +75,7 @@ func (pow *ProofOfWork) Run() (int, []byte) {
 	return nonce, hash[:]
 }
 
+// validate the block
 func (pow *ProofOfWork) Validate() bool {
 	var intHash big.Int
 
@@ -81,4 +86,3 @@ func (pow *ProofOfWork) Validate() bool {
 
 	return intHash.Cmp(pow.Target) == -1
 }
-
